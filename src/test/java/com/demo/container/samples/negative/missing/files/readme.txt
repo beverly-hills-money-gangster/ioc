@@ -1,0 +1,1 @@
+This folder has no java classes at all. So component scan can't get components from here.
