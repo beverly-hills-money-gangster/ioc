@@ -3,7 +3,7 @@ package com.demo.container;
 import com.demo.annotation.Component;
 import com.demo.annotation.Profile;
 import com.demo.dependency.DependencyGraph;
-import com.demo.util.ProfileUtil;
+import com.demo.registry.ProfileRegistryReader;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Queue;
@@ -15,7 +15,13 @@ import org.reflections.Reflections;
 
 public class ComponentClassScanner {
 
-  public static Queue<Class<?>> getAllComponentsClasses(final String packageName) {
+  private final ProfileRegistryReader profileRegistry;
+
+  public ComponentClassScanner(final ProfileRegistryReader profileRegistry) {
+    this.profileRegistry = profileRegistry;
+  }
+
+  public Queue<Class<?>> getAllComponentsClasses(final String packageName) {
     if (StringUtils.isBlank(packageName)) {
       throw new IllegalArgumentException("Package can't be empty/null/blank");
     } else if (!SourceVersion.isName(packageName)) {
@@ -24,9 +30,9 @@ public class ComponentClassScanner {
     return new DependencyGraph(getClassesToScan(packageName)).traverse();
   }
 
-  private static Set<Class<?>> getClassesToScan(final String packageName) {
+  private Set<Class<?>> getClassesToScan(final String packageName) {
     var reflections = new Reflections(packageName);
-    var activeProfiles = ProfileUtil.getActiveProfiles();
+    var activeProfiles = profileRegistry.getActiveProfiles();
     var classes = new HashSet<>(reflections.getTypesAnnotatedWith(Component.class));
     return classes.stream().filter(clazz -> {
       if (!clazz.isAnnotationPresent(Profile.class)) {

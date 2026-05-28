@@ -1,11 +1,11 @@
 package com.demo.container.samples.positive.dependency.application.datasource;
 
-public interface Datasource {
+public abstract class Datasource {
 
-  void set(String key, Object value);
+  public abstract void set(String key, Object value);
 
-  <T> T get(String key);
+  public abstract <T> T get(String key);
 
-  boolean isConnected();
+  public abstract boolean isConnected();
 
 }

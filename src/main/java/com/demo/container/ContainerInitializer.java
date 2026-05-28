@@ -1,19 +1,30 @@
 package com.demo.container;
 
 import com.demo.factory.InstanceFactory;
+import com.demo.registry.ProfileRegistry;
 
 public class ContainerInitializer {
 
-  public static ContainerReader init(final Class<?> mainClass) {
+  private final ProfileRegistry profileRegistry = new ProfileRegistry();
+
+  public ContainerInitializer(final String... profiles) {
+    if (profiles != null) {
+      for (String profile : profiles) {
+        profileRegistry.activateProfile(profile);
+      }
+    }
+  }
+
+  public ContainerReader init(final Class<?> mainClass) {
     return init(mainClass.getPackageName());
   }
 
-  public static ContainerReader init(final String packageName) {
+  public ContainerReader init(final String packageName) {
+    var componentClassScanner = new ComponentClassScanner(profileRegistry);
     Container container = new Container();
-    var allComponentsClasses = ComponentClassScanner.getAllComponentsClasses(packageName);
-    for (Class<?> componentClazz : allComponentsClasses) {
+    for (var componentClass : componentClassScanner.getAllComponentsClasses(packageName)) {
       try {
-        container.register(InstanceFactory.createObject(componentClazz, container));
+        container.register(InstanceFactory.createObject(componentClass, container));
       } catch (Exception e) {
         throw new IllegalStateException("Can't init container", e);
       }

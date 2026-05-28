@@ -5,10 +5,7 @@ import com.demo.util.ReflectionUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class InstanceFactory {
@@ -23,10 +20,9 @@ public class InstanceFactory {
       if (paramType.isArray()) {
         var arrayType = ReflectionUtil.getArrayType(paramType);
         arguments[i] = createArray(arrayType, containerReader.getInstances(arrayType));
-      } else if (Collection.class.isAssignableFrom(paramType)) {
+      } else if (List.class.isAssignableFrom(paramType)) {
         var collectionItemType = ReflectionUtil.getCollectionTypeFromConstructor(constructor, i);
-        var collection = createCollection(paramType,
-            containerReader.getInstances(collectionItemType));
+        var collection = createList(paramType, containerReader.getInstances(collectionItemType));
         arguments[i] = collection;
       } else {
         arguments[i] = createSingularInstance(paramType, containerReader);
@@ -66,23 +62,15 @@ public class InstanceFactory {
     return array;
   }
 
-  static Collection<Object> createCollection(
+  static List<Object> createList(
       final Class<?> clazz,
       final List<?> items)
       throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-    Collection<Object> collection;
+    List<Object> collection;
     if (clazz.isInterface()) {
-      if (clazz == List.class) {
-        collection = new ArrayList<>();
-      } else if (clazz == Set.class) {
-        collection = new HashSet<>();
-      } else {
-        throw new IllegalStateException(
-            "Can't create collection. Should be either Set or List. Check class %s".formatted(
-                clazz.getCanonicalName()));
-      }
+      collection = new ArrayList<>();
     } else {
-      collection = (Collection) clazz.getDeclaredConstructor().newInstance();
+      collection = (List) clazz.getDeclaredConstructor().newInstance();
     }
     collection.addAll(items);
     return collection;

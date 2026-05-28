@@ -13,7 +13,8 @@ public class ComponentClassScannerTest {
 
   @Test
   public void testRealApp() {
-    var container = ContainerInitializer.init(AppSampleMainClass.class);
+    var container = new ContainerInitializer("default")
+        .init(AppSampleMainClass.class);
     var main = container.getInstance(AppSampleMainClass.class);
 
     main.createAccount("abc");

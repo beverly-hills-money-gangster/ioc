@@ -2,6 +2,7 @@ package com.demo;
 
 import com.demo.container.ContainerInitializer;
 
+// TODO use maven wrapper
 // TODO add javadoc
 // TODO make clean DDD design
 // TODO add more tests
@@ -10,9 +11,10 @@ import com.demo.container.ContainerInitializer;
 // TODO configure circle ci
 // TODO introduce @PostConstruct
 // TODO close all closeables on exit
+// TODO don't support Sets. Support List only
 public class Main {
 
   static void main() {
-    ContainerInitializer.init(Main.class);
+    new ContainerInitializer().init(Main.class);
   }
 }

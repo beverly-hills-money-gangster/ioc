@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class Container implements ContainerWriter, ContainerReader {
+public class Container implements ContainerReader {
 
   private final Map<Class<?>, Object> container = new ConcurrentHashMap<>();
 
@@ -33,7 +33,7 @@ public class Container implements ContainerWriter, ContainerReader {
         .collect(Collectors.toList());
   }
 
-  @Override
+
   public void register(final Object object) {
     var previousObject = container.putIfAbsent(object.getClass(), object);
     if (previousObject != null) {

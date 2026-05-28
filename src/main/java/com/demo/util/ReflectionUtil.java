@@ -5,7 +5,6 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-// TODO test it
 public class ReflectionUtil {
 
   public static Constructor<?> getMainConstructor(final Class<?> clazz) {
@@ -18,14 +17,7 @@ public class ReflectionUtil {
       throw new IllegalArgumentException(
           "Only one constructor is expected for class %s".formatted(clazz.getCanonicalName()));
     }
-    var constructor = clazz.getConstructors()[0];
-    for (Class<?> parameterType : constructor.getParameterTypes()) {
-      if (parameterType.isPrimitive()) {
-        throw new IllegalStateException("%s constructor can't have primitive params".formatted(
-            parameterType.getCanonicalName()));
-      }
-    }
-    return constructor;
+    return clazz.getConstructors()[0];
   }
 
   public static Class<?> getArrayType(final Class<?> arrayClass) {
