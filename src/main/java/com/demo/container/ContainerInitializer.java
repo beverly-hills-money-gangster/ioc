@@ -15,11 +15,11 @@ public class ContainerInitializer {
     }
   }
 
-  public ContainerReader init(final Class<?> mainClass) {
+  public Container init(final Class<?> mainClass) {
     return init(mainClass.getPackageName());
   }
 
-  public ContainerReader init(final String packageName) {
+  public Container init(final String packageName) {
     var componentClassScanner = new ComponentClassScanner(profileRegistry);
     Container container = new Container();
     for (var componentClass : componentClassScanner.getAllComponentsClasses(packageName)) {

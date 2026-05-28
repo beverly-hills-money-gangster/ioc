@@ -12,9 +12,13 @@ import com.demo.container.ContainerInitializer;
 // TODO introduce @PostConstruct
 // TODO close all closeables on exit
 // TODO don't support Sets. Support List only
+// TODO integrate with logback
+// TODO read more on reflection, annotation, spring, tree and cycles
 public class Main {
 
   static void main() {
-    new ContainerInitializer().init(Main.class);
+    try (var container = new ContainerInitializer().init(Main.class)) {
+
+    }
   }
 }

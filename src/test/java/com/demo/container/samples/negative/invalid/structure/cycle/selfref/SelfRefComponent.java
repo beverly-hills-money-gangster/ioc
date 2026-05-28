@@ -1,4 +1,4 @@
-package com.demo.container.samples.negative.invalid.constructor.selfref;
+package com.demo.container.samples.negative.invalid.structure.cycle.selfref;
 
 import com.demo.annotation.Component;
 

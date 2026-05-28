@@ -1,12 +1,14 @@
 package com.demo.container;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class Container implements ContainerReader {
+public class Container implements ContainerReader, Closeable {
 
   private final Map<Class<?>, Object> container = new ConcurrentHashMap<>();
 
@@ -41,6 +43,19 @@ public class Container implements ContainerReader {
           "Can't register object of class %s because instance already exists in container"
               .formatted(object.getClass().getCanonicalName())
       );
+    }
+  }
+
+  @Override
+  public void close() {
+    var componentsToClose = getInstances(Closeable.class);
+    for (var closeable : componentsToClose) {
+      try {
+        closeable.close();
+      } catch (IOException e) {
+        // TODO log and go on
+        throw new RuntimeException(e);
+      }
     }
   }
 }

@@ -13,18 +13,16 @@ public class ComponentClassScannerTest {
 
   @Test
   public void testRealApp() {
-    var container = new ContainerInitializer("default")
-        .init(AppSampleMainClass.class);
-    var main = container.getInstance(AppSampleMainClass.class);
-
-    main.createAccount("abc");
-    main.deposit("abc", 15);
-    int total = main.deposit("abc", 25);
-    assertEquals(40, total);
-    assertEquals(Map.of(
-            InMemoryDatasourceHealthCheck.class, true,
-            PingHealthCheck.class, true),
-        main.getHealth());
+    try (var container = new ContainerInitializer("default").init(AppSampleMainClass.class)) {
+      var main = container.getInstance(AppSampleMainClass.class);
+      main.createAccount("abc");
+      main.deposit("abc", 15);
+      int total = main.deposit("abc", 25);
+      assertEquals(40, total);
+      assertEquals(Map.of(
+              InMemoryDatasourceHealthCheck.class, true,
+              PingHealthCheck.class, true),
+          main.getHealth());
+    }
   }
-
 }
