@@ -12,7 +12,6 @@ import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-// TODO add negative scenarios
 public class ReflectionUtilTest {
 
 

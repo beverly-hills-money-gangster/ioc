@@ -1,6 +1,8 @@
 package com.demo.container.samples.positive.dependency.application.datasource;
 
-public abstract class Datasource {
+import java.io.Closeable;
+
+public abstract class Datasource implements Closeable {
 
   public abstract void set(String key, Object value);
 

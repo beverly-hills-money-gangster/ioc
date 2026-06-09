@@ -2,10 +2,12 @@ package com.demo.container;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class Container implements ContainerReader, Closeable {
@@ -17,6 +19,24 @@ public class Container implements ContainerReader, Closeable {
     if (clazz == null) {
       throw new IllegalArgumentException("Instance can't be null");
     }
+
+    if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) {
+      var components = getInstances(clazz);
+      if (components.isEmpty()) {
+        throw new IllegalStateException(
+            "No component of type %s found".formatted(clazz.getCanonicalName()));
+      } else if (components.size() > 1) {
+        throw new IllegalStateException(
+            "Ambiguous dependency %s. Expected 1 candidate but found %s. See classes: %s".formatted(
+                clazz.getCanonicalName(), components.size(),
+                components.stream().map(object -> object.getClass().getCanonicalName())
+                    .collect(Collectors.toSet())));
+      }
+      return components.getFirst();
+    }
+
+
+    // TODO fallback to getInstances() if not found
     return (T) Optional.ofNullable(container.get(clazz))
         .orElseThrow(()
             -> new IllegalStateException("No instance of class %s found"
@@ -33,6 +53,21 @@ public class Container implements ContainerReader, Closeable {
             classObjectEntry -> clazz.isAssignableFrom(classObjectEntry.getKey()))
         .map(classObjectEntry -> (T) classObjectEntry.getValue())
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public <T> List<T> getInstancesNonEmpty(Class<T> clazz) {
+    var instances = getInstances(clazz);
+    if (instances == null || instances.isEmpty()) {
+      throw new IllegalStateException(
+          "Can't find instance of class %s".formatted(clazz.getCanonicalName()));
+    }
+    return instances;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return container.isEmpty();
   }
 
 
@@ -57,5 +92,10 @@ public class Container implements ContainerReader, Closeable {
         throw new RuntimeException(e);
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    return container.keySet().toString();
   }
 }

@@ -9,12 +9,12 @@ public class ReflectionUtil {
 
   public static Constructor<?> getMainConstructor(final Class<?> clazz) {
     if (clazz == null) {
-      throw new IllegalArgumentException("Can't get constructor from null");
+      throw new IllegalStateException("Can't get constructor from null");
     } else if (clazz.getConstructors().length == 0) {
-      throw new IllegalArgumentException(
+      throw new IllegalStateException(
           "No constructor available for class %s".formatted(clazz.getCanonicalName()));
     } else if (clazz.getConstructors().length != 1) {
-      throw new IllegalArgumentException(
+      throw new IllegalStateException(
           "Only one constructor is expected for class %s".formatted(clazz.getCanonicalName()));
     }
     return clazz.getConstructors()[0];
@@ -22,9 +22,9 @@ public class ReflectionUtil {
 
   public static Class<?> getArrayType(final Class<?> arrayClass) {
     if (arrayClass == null) {
-      throw new IllegalArgumentException("Array class can't be null");
+      throw new IllegalStateException("Array class can't be null");
     } else if (!arrayClass.isArray()) {
-      throw new IllegalArgumentException(
+      throw new IllegalStateException(
           "Class %s is not array".formatted(arrayClass.getCanonicalName()));
     }
     return arrayClass.getComponentType();

@@ -7,4 +7,8 @@ public interface ContainerReader {
   <T> T getInstance(Class<T> clazz);
 
   <T> List<T> getInstances(Class<T> clazz);
+
+  <T> List<T> getInstancesNonEmpty(Class<T> clazz);
+
+  boolean isEmpty();
 }

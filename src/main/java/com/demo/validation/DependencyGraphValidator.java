@@ -9,7 +9,7 @@ public class DependencyGraphValidator implements Validator<Map<Class<?>, Set<Cla
   public void validate(final Map<Class<?>, Set<Class<?>>> dependencyGraph) {
     dependencyGraph.forEach((clazz, dependencies) -> {
       if (dependencies.contains(clazz)) {
-        throw new IllegalStateException("Dependency can't be dependent on itself. Check class: %s"
+        throw new IllegalStateException("Component can't be dependent on itself. Check class: %s"
             .formatted(clazz.getCanonicalName()));
       }
       for (var dependency : dependencies) {

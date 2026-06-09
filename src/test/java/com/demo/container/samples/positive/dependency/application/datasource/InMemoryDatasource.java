@@ -25,4 +25,9 @@ public class InMemoryDatasource extends Datasource {
   public boolean isConnected() {
     return true;
   }
+
+  @Override
+  public void close() {
+    data.clear();
+  }
 }
