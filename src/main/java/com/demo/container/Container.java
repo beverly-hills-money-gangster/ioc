@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 // TODO add spotbugs
 // TODO integrate with jitpack
 // TODO circle ci integration
+// TODO read more about Spring bean creation + Reflection
 public class Container implements ContainerReader, Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Container.class);
