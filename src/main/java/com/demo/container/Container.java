@@ -7,10 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Container implements ContainerReader, Closeable {
+
+  private static final Logger LOG = LoggerFactory.getLogger(Container.class);
 
   private final Map<Class<?>, Object> container = new ConcurrentHashMap<>();
 
@@ -35,8 +38,6 @@ public class Container implements ContainerReader, Closeable {
       return components.getFirst();
     }
 
-
-    // TODO fallback to getInstances() if not found
     return (T) Optional.ofNullable(container.get(clazz))
         .orElseThrow(()
             -> new IllegalStateException("No instance of class %s found"
@@ -88,8 +89,7 @@ public class Container implements ContainerReader, Closeable {
       try {
         closeable.close();
       } catch (IOException e) {
-        // TODO log and go on
-        throw new RuntimeException(e);
+        LOG.error("Can't close component {}", closeable.getClass().getCanonicalName()e);
       }
     }
   }
