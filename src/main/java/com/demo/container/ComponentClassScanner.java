@@ -13,6 +13,9 @@ import javax.lang.model.SourceVersion;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 
+/**
+ * Scans components
+ */
 public class ComponentClassScanner {
 
   private final ProfileRegistryReader profileRegistry;
@@ -21,6 +24,10 @@ public class ComponentClassScanner {
     this.profileRegistry = profileRegistry;
   }
 
+  /**
+   * Returns all component classes in the given package.
+   * Classes are sorted by "who gets to initialize first".
+   */
   public Queue<Class<?>> getAllComponentsClasses(final String packageName) {
     if (StringUtils.isBlank(packageName)) {
       throw new IllegalArgumentException("Package can't be empty/null/blank");

@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Component instance factory
+ */
 public class InstanceFactory {
 
   private final Map<Class<?>, Decorator> decorators;
@@ -18,6 +21,10 @@ public class InstanceFactory {
   }
 
 
+  /**
+   * Creates an object instance. If the given class has dependencies then it's taken from the
+   * container and injected into the created object.
+   */
   public Object createObject(final Class<?> clazz,
       final ContainerReader containerReader)
       throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
@@ -43,13 +50,13 @@ public class InstanceFactory {
   }
 
 
-  static Object createSingularInstance(
+  private static Object createSingularInstance(
       final Class<?> clazz,
       final ContainerReader containerReader) {
     return containerReader.getInstance(clazz);
   }
 
-  static Object createArray(final Class<?> clazz, final List<?> items) {
+  private static Object createArray(final Class<?> clazz, final List<?> items) {
     Object array = java.lang.reflect.Array.newInstance(clazz, items.size());
     int index = 0;
     for (Object item : items) {
@@ -59,7 +66,7 @@ public class InstanceFactory {
     return array;
   }
 
-  static List<Object> createList(
+  private static List<Object> createList(
       final Class<?> clazz,
       final List<?> items)
       throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {

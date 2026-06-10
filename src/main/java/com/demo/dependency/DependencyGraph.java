@@ -17,18 +17,27 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class DependencyGraph implements Cloneable {
+/**
+ * A class dependency graph
+ */
+public class DependencyGraph {
 
   private final DependencyTreeToQueue dependencyTreeToQueue = new DependencyTreeToQueue();
 
   private final ComponentValidator componentClassValidator = new ComponentValidator();
 
+  private final DependencyGraphValidator dependencyGraphValidator = new DependencyGraphValidator();
+
+  // Key = class, values = dependencies. It's basically an adjacency list
   private final Map<Class<?>, Set<Class<?>>> dependencyGraph;
 
   private DependencyGraph(Map<Class<?>, Set<Class<?>>> dependencyGraph) {
     this.dependencyGraph = dependencyGraph;
   }
 
+  /**
+   * Creates a dependency graph for the classes
+   */
   public DependencyGraph(final Set<Class<?>> classes) {
     // key -> node, values -> adjacent nodes
     dependencyGraph = new HashMap<>();
@@ -66,10 +75,12 @@ public class DependencyGraph implements Cloneable {
         }
       }
     });
-    DependencyGraphValidator dependencyGraphValidator = new DependencyGraphValidator();
     dependencyGraphValidator.validate(dependencyGraph);
   }
 
+  /**
+   * Traverses all classes
+   */
   public Queue<Class<?>> traverse() {
     return dependencyTreeToQueue.convert(this);
   }
@@ -86,6 +97,14 @@ public class DependencyGraph implements Cloneable {
     dependencyGraph.remove(clazz);
   }
 
+
+  public DependencyGraph deepCopy() {
+    var deepCopy = new HashMap<Class<?>, Set<Class<?>>>();
+    dependencyGraph.forEach(
+        (key, values) -> deepCopy.put(key, new HashSet<>(values)));
+    return new DependencyGraph(deepCopy);
+  }
+
   @Override
   public String toString() {
     List<String> dependenciesStrings = new ArrayList<>();
@@ -95,13 +114,5 @@ public class DependencyGraph implements Cloneable {
       dependenciesStrings.add(builder);
     }
     return String.join("\n", dependenciesStrings);
-  }
-
-  @Override
-  public DependencyGraph clone() {
-    var dependencyHardCopy = new HashMap<Class<?>, Set<Class<?>>>();
-    dependencyGraph.forEach(
-        (key, values) -> dependencyHardCopy.put(key, new HashSet<>(values)));
-    return new DependencyGraph(dependencyHardCopy);
   }
 }

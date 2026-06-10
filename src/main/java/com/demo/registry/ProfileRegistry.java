@@ -7,12 +7,16 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * Components profile registry
+ */
 public class ProfileRegistry implements ProfileRegistryReader {
 
 
   private final Set<String> activeProfiles = ConcurrentHashMap.newKeySet();
 
   public ProfileRegistry() {
+    // by default, profiles are taken from env var
     var envProfiles = Optional.ofNullable(System.getenv("ACTIVE_PROFILES"))
         .filter(StringUtils::isNotBlank)
         .map(env -> Arrays.stream(env.split(",")).map(StringUtils::trim).toList())

@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Initializes a component container
+ */
 public class ContainerInitializer {
 
   private final ProfileRegistry profileRegistry = new ProfileRegistry();
@@ -22,6 +25,37 @@ public class ContainerInitializer {
     }
   }
 
+
+  /**
+   * Initializes a container
+   *
+   * @param packageName package for components scan
+   * @return a fully initialized container
+   */
+  public Container init(final String packageName) {
+    var instanceFactory = new InstanceFactory(decorators);
+    Container container = new Container();
+    var componentClassScanner = new ComponentClassScanner(profileRegistry);
+
+    for (var componentClass : componentClassScanner.getAllComponentsClasses(packageName)) {
+      try {
+        container.register(instanceFactory.createObject(componentClass, container));
+      } catch (IllegalStateException e) {
+        throw e;
+      } catch (Exception e) {
+        throw new IllegalStateException("Can't init container", e);
+      }
+    }
+    return container;
+  }
+
+  public Container init(final Class<?> mainClass) {
+    return init(mainClass.getPackageName());
+  }
+
+  /**
+   * Add a component decorator. Pretty useful for mocking/stubbing components for testing.
+   */
   public void addDecorator(final Class<?> clazz, Decorator decorator) {
     if (clazz == null) {
       throw new IllegalArgumentException("Can't decorate null");
@@ -39,27 +73,6 @@ public class ContainerInitializer {
               .formatted(clazz.getCanonicalName(),
                   existingDecorator.getClass().getCanonicalName()));
     });
-  }
-
-  public Container init(final Class<?> mainClass) {
-    return init(mainClass.getPackageName());
-  }
-
-  public Container init(final String packageName) {
-    var instanceFactory = new InstanceFactory(decorators);
-    Container container = new Container();
-    var componentClassScanner = new ComponentClassScanner(profileRegistry);
-
-    for (var componentClass : componentClassScanner.getAllComponentsClasses(packageName)) {
-      try {
-        container.register(instanceFactory.createObject(componentClass, container));
-      } catch (IllegalStateException e) {
-        throw e;
-      } catch (Exception e) {
-        throw new IllegalStateException("Can't init container", e);
-      }
-    }
-    return container;
   }
 
 }

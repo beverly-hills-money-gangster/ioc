@@ -11,16 +11,27 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The core component of the framework that contains all components
+ */
 public class Container implements ContainerReader, Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Container.class);
 
   private final Map<Class<?>, Object> container = new ConcurrentHashMap<>();
 
+  /**
+   * Returns an instance of a given class.
+   *
+   * @param clazz - a class, an interface or even an abstract class
+   * @return fully initialized instance of the class
+   * @throws IllegalStateException if no instance is found or more than one instance candidate
+   *                               found
+   */
   @Override
   public <T> T getInstance(final Class<T> clazz) {
     if (clazz == null) {
-      throw new IllegalArgumentException("Instance can't be null");
+      throw new IllegalArgumentException("Class can't be null");
     }
 
     if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) {
@@ -44,6 +55,12 @@ public class Container implements ContainerReader, Closeable {
             .formatted(clazz.getCanonicalName())));
   }
 
+  /**
+   * Returns fully initialized instances of the given class
+   *
+   * @param clazz - a class, an interface or even an abstract class
+   * @return a list of instances(can be empty if no candidate found)
+   */
   @Override
   public <T> List<T> getInstances(final Class<T> clazz) {
     if (clazz == null) {
@@ -56,6 +73,13 @@ public class Container implements ContainerReader, Closeable {
         .collect(Collectors.toList());
   }
 
+  /**
+   * Returns fully initialized instances of the given class
+   *
+   * @param clazz - a class, an interface or even an abstract class
+   * @return a list of instances
+   * @throws IllegalStateException if no instance is found
+   */
   @Override
   public <T> List<T> getInstancesNonEmpty(Class<T> clazz) {
     var instances = getInstances(clazz);
@@ -72,7 +96,13 @@ public class Container implements ContainerReader, Closeable {
   }
 
 
-  public void register(final Object object) {
+  /**
+   * Registers an object in the container
+   */
+  void register(final Object object) {
+    if (object == null) {
+      throw new IllegalStateException("Can't register a null object");
+    }
     var previousObject = container.putIfAbsent(object.getClass(), object);
     if (previousObject != null) {
       throw new IllegalArgumentException(
@@ -82,6 +112,9 @@ public class Container implements ContainerReader, Closeable {
     }
   }
 
+  /**
+   * Closes all closable components
+   */
   @Override
   public void close() {
     var componentsToClose = getInstances(Closeable.class);
