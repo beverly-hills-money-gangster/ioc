@@ -89,7 +89,7 @@ public class Container implements ContainerReader, Closeable {
       try {
         closeable.close();
       } catch (IOException e) {
-        LOG.error("Can't close component {}", closeable.getClass().getCanonicalName()e);
+        LOG.error("Can't close component {}", closeable.getClass().getCanonicalName(), e);
       }
     }
   }
