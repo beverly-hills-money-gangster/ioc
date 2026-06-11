@@ -135,5 +135,3 @@ try (var container = new ContainerInitializer().init(Main.class)) {
 * Field injection is not supported
 * Setter injection is not supported
 * Components must use constructor injection only
-
----
