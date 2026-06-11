@@ -1,25 +1,23 @@
 package com.demo.factory;
 
 import com.demo.container.ContainerReader;
-import com.demo.decorator.Decorator;
+import com.demo.registry.DecoratorRegistryReader;
 import com.demo.util.ReflectionUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * Component instance factory
  */
 public class InstanceFactory {
 
-  private final Map<Class<?>, Decorator> decorators;
 
-  public InstanceFactory(Map<Class<?>, Decorator> decorators) {
+  private final DecoratorRegistryReader decorators;
+
+  public InstanceFactory(DecoratorRegistryReader decorators) {
     this.decorators = decorators;
   }
-
 
   /**
    * Creates an object instance. If the given class has dependencies then it's taken from the
@@ -45,7 +43,7 @@ public class InstanceFactory {
       }
     }
     var object = constructor.newInstance(arguments);
-    return Optional.ofNullable(decorators.get(object.getClass())).map(
+    return decorators.getDecorator(object.getClass()).map(
         decorator -> decorator.decorate(object)).orElse(object);
   }
 

@@ -35,7 +35,7 @@ public class DependencyTreeToQueue implements
     // then we likely have a cyclic dependency
     if (solvedDependencyClasses.isEmpty()) {
       throw new IllegalStateException(
-          "Can't traverse dependency graph. Likely a cycle detected. Check tree\n%s".formatted(
+          "Can't traverse dependency graph. Likely a cycle detected. Check tree %n%s".formatted(
               dependencyGraph));
     }
     // add all classes to the accumulator

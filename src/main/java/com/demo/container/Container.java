@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
  */
 // TODO add readme
 // TODO proofread
-// TODO add spotbugs
 // TODO integrate with jitpack
 // TODO circle ci integration
 // TODO read more about Spring bean creation + Reflection
