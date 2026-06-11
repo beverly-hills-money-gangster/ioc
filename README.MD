@@ -108,6 +108,51 @@ Use `@Profile` when multiple implementations of the same interface or abstract c
 
 This allows selecting different implementations for different environments or configurations.
 
+Use the `ACTIVE_PROFILES` environment variable to specify active profiles.
+
+The format is comma-separated:
+
+```
+ACTIVE_PROFILES=default,test
+```
+
+If multiple components implement the same interface or abstract class,
+the framework will prefer the component whose `@Profile` matches one of the active profiles.
+
+Example:
+
+```java
+@Component
+@Profile(profiles = "test")
+public class TestRepository implements Repository {
+}
+```
+
+```java
+@Component
+@Profile(profiles = "prod")
+public class ProdRepository implements Repository {
+}
+```
+
+With:
+
+```
+ACTIVE_PROFILES=test
+```
+
+the `TestRepository` component will be selected.
+
+Multiple profiles can also be specified on a single component:
+
+```java
+@Profile(profiles = {"test", "dev"})
+```
+
+This means the component will be created if either the `test` or `dev`
+profile is active.
+
+
 ---
 
 # Resource Management
