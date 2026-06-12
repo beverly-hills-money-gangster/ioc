@@ -1,5 +1,8 @@
 # IoC — Simple Ultra-Lightweight Dependency Injection Framework
 
+[![](https://jitpack.io/v/beverly-hills-money-gangster/ioc.svg)](https://jitpack.io/#beverly-hills-money-gangster/ioc)
+
+
 A tiny, fast, and test-friendly dependency injection framework inspired by Spring.
 
 ## Features
