@@ -6,11 +6,10 @@ import com.demo.dependency.DependencyGraph;
 import com.demo.registry.ProfileRegistryReader;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.lang.model.SourceVersion;
-import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 
 /**
@@ -25,16 +24,13 @@ public class ComponentClassScanner {
   }
 
   /**
-   * Returns all component classes in the given package.
-   * Classes are sorted by "who gets to initialize first".
+   * Returns all component classes in the given package. Classes are sorted by "who gets to
+   * initialize first".
    */
-  public Queue<Class<?>> getAllComponentsClasses(final String packageName) {
-    if (StringUtils.isBlank(packageName)) {
-      throw new IllegalArgumentException("Package can't be empty/null/blank");
-    } else if (!SourceVersion.isName(packageName)) {
-      throw new IllegalArgumentException("Invalid package name " + packageName);
-    }
-    return new DependencyGraph(getClassesToScan(packageName)).traverse();
+  public Queue<Class<?>> getAllComponentsClasses(final List<String> packages) {
+    Set<Class<?>> allClasses = new HashSet<>();
+    packages.forEach(pack -> allClasses.addAll(getClassesToScan(pack)));
+    return new DependencyGraph(allClasses).traverse();
   }
 
   private Set<Class<?>> getClassesToScan(final String packageName) {

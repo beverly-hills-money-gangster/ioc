@@ -1,11 +1,10 @@
 package com.demo.container;
 
+import com.demo.annotation.Primary;
 import java.io.Closeable;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -34,25 +33,25 @@ public class Container implements ContainerReader, Closeable {
       throw new IllegalArgumentException("Class can't be null");
     }
 
-    if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) {
-      var components = getInstances(clazz);
-      if (components.isEmpty()) {
-        throw new IllegalStateException(
-            "No component of type %s found".formatted(clazz.getCanonicalName()));
-      } else if (components.size() > 1) {
-        throw new IllegalStateException(
-            "Ambiguous dependency %s. Expected 1 candidate but found %s. See classes: %s".formatted(
-                clazz.getCanonicalName(), components.size(),
-                components.stream().map(object -> object.getClass().getCanonicalName())
-                    .collect(Collectors.toSet())));
+    var components = getInstances(clazz);
+    if (components.isEmpty()) {
+      throw new IllegalStateException(
+          "No component of type %s found".formatted(clazz.getCanonicalName()));
+    } else if (components.size() > 1) {
+      // if we get more than 1 candidate, then try to find the one with @Primary annotation
+      var primaryComponents = components.stream()
+          .filter(component -> component.getClass().isAnnotationPresent(Primary.class)).toList();
+      if (primaryComponents.size() == 1) {
+        return primaryComponents.getFirst();
       }
-      return components.getFirst();
+      throw new IllegalStateException(
+          "Ambiguous dependency %s. Expected 1 candidate but found %s. See classes: %s".formatted(
+              clazz.getCanonicalName(), components.size(),
+              components.stream().map(object -> object.getClass().getCanonicalName())
+                  .collect(Collectors.toSet())));
     }
+    return components.getFirst();
 
-    return (T) Optional.ofNullable(container.get(clazz))
-        .orElseThrow(()
-            -> new IllegalStateException("No instance of class %s found"
-            .formatted(clazz.getCanonicalName())));
   }
 
   /**
@@ -121,6 +120,7 @@ public class Container implements ContainerReader, Closeable {
     for (var closeable : componentsToClose) {
       try {
         closeable.close();
+        LOG.debug("Component {} closed", closeable.getClass().getCanonicalName());
       } catch (IOException e) {
         LOG.error("Can't close component {}", closeable.getClass().getCanonicalName(), e);
       }

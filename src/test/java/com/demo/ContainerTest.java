@@ -1,6 +1,7 @@
 package com.demo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,6 +13,10 @@ import com.demo.container.samples.positive.dependency.application.datasource.Dat
 import com.demo.container.samples.positive.dependency.application.datasource.InMemoryDatasource;
 import com.demo.container.samples.positive.dependency.application.health.InMemoryDatasourceHealthCheck;
 import com.demo.container.samples.positive.dependency.application.health.PingHealthCheck;
+import com.demo.container.samples.positive.dependency.primary.concrete.SomeComponent;
+import com.demo.container.samples.positive.dependency.primary.concrete.SomePrimaryComponent;
+import com.demo.container.samples.positive.dependency.primary.intrfc.SomePrimaryServiceImpl;
+import com.demo.container.samples.positive.dependency.primary.intrfc.SomeService;
 import com.demo.container.samples.positive.independent.IndependentComponent;
 import java.io.IOException;
 import java.util.Map;
@@ -54,7 +59,7 @@ public class ContainerTest {
         container.getInstance(Thread.class);
       }
     });
-    assertEquals("No instance of class java.lang.Thread found", ex.getMessage());
+    assertEquals("No component of type java.lang.Thread found", ex.getMessage());
   }
 
   @Test
@@ -301,4 +306,50 @@ public class ContainerTest {
           com.demo.container.samples.positive.dependency.collection.array.DependencyComponent3.class));
     }
   }
+
+  @Test
+  public void testPrimaryInterface() {
+    try (var container = new ContainerInitializer().init(
+        "com.demo.container.samples.positive.dependency.primary.intrfc")) {
+      assertInstanceOf(SomePrimaryServiceImpl.class, container.getInstance(SomeService.class));
+    }
+  }
+
+  @Test
+  public void testPrimaryConcrete() {
+    try (var container = new ContainerInitializer().init(
+        "com.demo.container.samples.positive.dependency.primary.concrete")) {
+      assertInstanceOf(SomePrimaryComponent.class, container.getInstance(SomeComponent.class));
+    }
+  }
+
+  @Test
+  public void testMultiPackageScan() {
+    try (var container = new ContainerInitializer().init(
+        "com.demo.container.samples.positive.dependency.primary.intrfc",
+        "com.demo.container.samples.positive.dependency.primary.concrete",
+        "com.demo.container.samples.positive.independent"
+    )) {
+      assertNotNull(container.getInstance(
+          com.demo.container.samples.positive.dependency.primary.intrfc.SomeService.class));
+      assertNotNull(container.getInstance(
+          com.demo.container.samples.positive.dependency.primary.concrete.SomeComponent.class));
+      assertNotNull(container.getInstance(
+          com.demo.container.samples.positive.independent.IndependentComponent.class));
+    }
+  }
+
+
+  @Test
+  public void testNegativePrimaryInterface() {
+    var ex = assertThrows(IllegalStateException.class, () -> {
+      try (var container = new ContainerInitializer().init(
+          "com.demo.container.samples.negative.invalid.structure.primary.intrfc")) {
+        container.getInstance(
+            com.demo.container.samples.negative.invalid.structure.primary.intrfc.SomeService.class);
+      }
+    });
+    assertTrue(ex.getMessage().startsWith("Ambiguous dependency"));
+  }
+
 }

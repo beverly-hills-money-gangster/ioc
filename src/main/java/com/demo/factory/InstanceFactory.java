@@ -6,12 +6,15 @@ import com.demo.util.ReflectionUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Component instance factory
  */
 public class InstanceFactory {
 
+  private static final Logger LOG = LoggerFactory.getLogger(InstanceFactory.class);
 
   private final DecoratorRegistryReader decorators;
 
@@ -43,8 +46,10 @@ public class InstanceFactory {
       }
     }
     var object = constructor.newInstance(arguments);
-    return decorators.getDecorator(object.getClass()).map(
+    var decoratedComponent = decorators.getDecorator(object.getClass()).map(
         decorator -> decorator.decorate(object)).orElse(object);
+    LOG.debug("Component {} created", decoratedComponent.getClass().getCanonicalName());
+    return decoratedComponent;
   }
 
 
