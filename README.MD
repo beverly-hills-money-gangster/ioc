@@ -7,8 +7,7 @@ A tiny, fast, and test-friendly dependency injection framework inspired by Sprin
 
 ## Features
 
-* `@Component` annotation support
-* `@Profile` annotation support
+* `@Component`, `@Profile` and `@Primary` annotation support
 * Constructor-based dependency injection
 * Automatic cyclic dependency detection
 * Interface and abstract class resolution
