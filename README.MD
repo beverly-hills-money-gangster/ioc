@@ -14,6 +14,7 @@ A tiny, fast, and test-friendly dependency injection framework inspired by Sprin
 * Collection injection (`List<T>` and `T[]`)
 * Automatic resource cleanup
 * Lightweight and easy to test
+* Lombok-friendly
 
 ---
 
